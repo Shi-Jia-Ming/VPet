@@ -64,24 +64,25 @@ namespace VPet_Simulator.Windows
                 }
             }
             //刷新显示
-            if (textList.Count > 0)
-            {
-                tbTalk.Items.Clear();
-                foreach (var item in textList)
-                {
-                    if (!textSaid.Contains(item.Choose))
-                    {
-                        tbTalk.Items.Add(item.Choose.Translate());
-                    }
-                }
-                btn_Send.IsEnabled = true;
-            }
-            else
-            {
-                tbTalk.Items.Clear();
-                tbTalk.Items.Add("没有可以说的话".Translate());
-                btn_Send.IsEnabled = false;
-            }
+            //if (textList.Count > 0)
+            //{
+            //    tbTalk.Items.Clear();
+            //    foreach (var item in textList)
+            //    {
+            //        if (!textSaid.Contains(item.Choose))
+            //        {
+            //            tbTalk.Items.Add(item.Choose.Translate());
+            //        }
+            //    }
+            //    btn_Send.IsEnabled = true;
+            //}
+            //else
+            //{
+            //    tbTalk.Items.Clear();
+            //    tbTalk.Items.Add("没有可以说的话".Translate());
+            //    btn_Send.IsEnabled = false;
+            //}
+            tbTalkInput.Clear();
             double min = (RelsTime - DateTime.Now).TotalMinutes;
             double prograss = 1 - min / 10;
             if (prograss > 1)
@@ -98,59 +99,70 @@ namespace VPet_Simulator.Windows
 
         private void btn_Send_Click(object sender, RoutedEventArgs e)
         {
-            if (tbTalk.SelectedIndex == -1 || tbTalk.Text == "没有可以说的话".Translate() || textList.Count == 0)
-            {
-                return;
-            }
+            //if (tbTalk.SelectedIndex == -1 || tbTalk.Text == "没有可以说的话".Translate() || textList.Count == 0)
+            //{
+            //    return;
+            //}
             mw.Main.ToolBar.Visibility = Visibility.Collapsed;
-            var say = textList[tbTalk.SelectedIndex];
-            textList.RemoveAt(tbTalk.SelectedIndex);
+            //var say = textList[tbTalk.SelectedIndex];
+
+            //var say = await DeepSeek.GetResponse(tbTalkInput.GetLineText(0));
+   //         string responseAll = "";
+			//await foreach (var response in DeepSeek.GetResponse(tbTalkInput.GetLineText(0)))
+			//{
+   //             responseAll += response;
+			//	mw.Main.SayRnd(responseAll);
+			//}
+            mw.Main.SayRnd(DeepSeek.GetResponse(tbTalkInput.GetLineText(0)));
+			//Console.WriteLine("选项：" + say);
+			//mw.Main.SayRnd(say);
+            //textList.RemoveAt(tbTalk.SelectedIndex);
             //聊天效果
-            if (say.Exp != 0)
-            {
-                if (say.Exp > 0)
-                {
-                    mw.GameSavesData.Statistics[(gint)"stat_say_exp_p"]++;
-                }
-                else
-                    mw.GameSavesData.Statistics[(gint)"stat_say_exp_d"]++;
-            }
-            if (say.Likability != 0)
-            {
-                if (say.Likability > 0)
-                    mw.GameSavesData.Statistics[(gint)"stat_say_like_p"]++;
-                else
-                    mw.GameSavesData.Statistics[(gint)"stat_say_like_d"]++;
-            }
-            if (say.Money != 0)
-            {
-                if (say.Money > 0)
-                    mw.GameSavesData.Statistics[(gint)"stat_say_money_p"]++;
-                else
-                    mw.GameSavesData.Statistics[(gint)"stat_say_money_d"]++;
-            }
-            mw.Main.Core.Save.EatFood(say);
-            mw.Main.Core.Save.Money += say.Money;
+            //if (say.Exp != 0)
+            //{
+            //    if (say.Exp > 0)
+            //    {
+            //        mw.GameSavesData.Statistics[(gint)"stat_say_exp_p"]++;
+            //    }
+            //    else
+            //        mw.GameSavesData.Statistics[(gint)"stat_say_exp_d"]++;
+            //}
+            //if (say.Likability != 0)
+            //{
+            //    if (say.Likability > 0)
+            //        mw.GameSavesData.Statistics[(gint)"stat_say_like_p"]++;
+            //    else
+            //        mw.GameSavesData.Statistics[(gint)"stat_say_like_d"]++;
+            //}
+            //if (say.Money != 0)
+            //{
+            //    if (say.Money > 0)
+            //        mw.GameSavesData.Statistics[(gint)"stat_say_money_p"]++;
+            //    else
+            //        mw.GameSavesData.Statistics[(gint)"stat_say_money_d"]++;
+            //}
+            //mw.Main.Core.Save.EatFood(say);
+            //mw.Main.Core.Save.Money += say.Money;
 
-            textSaid.Add(say.Choose);
-            RelsTime = RelsTime.AddMinutes(5);
+            //textSaid.Add(say.Choose);
+            //RelsTime = RelsTime.AddMinutes(5);
 
-            mw.Main.SayRnd(say.ConverText(mw.Main), desc: say.FoodToDescription());
-            if (say.ToTags.Count > 0)
-            {
-                var list = mw.SelectTexts.FindAll(x => x.ContainsTag(say.ToTags)).ToList();
-                while (list.Count > 0)
-                {
-                    int sid = Function.Rnd.Next(list.Count);
-                    var select = list[sid];
-                    list.RemoveAt(sid);
-                    if (textList.Find(x => x.Choose == select.Choose) == null && !textSaid.Contains(select.Choose) && select.CheckState(mw.Main))
-                    {
-                        textList.Add(select);
-                        break;
-                    }
-                }
-            }
+            //mw.Main.SayRnd(say.ConverText(mw.Main), desc: say.FoodToDescription());
+            //if (say.ToTags.Count > 0)
+            //{
+            //    var list = mw.SelectTexts.FindAll(x => x.ContainsTag(say.ToTags)).ToList();
+            //    while (list.Count > 0)
+            //    {
+            //        int sid = Function.Rnd.Next(list.Count);
+            //        var select = list[sid];
+            //        list.RemoveAt(sid);
+            //        if (textList.Find(x => x.Choose == select.Choose) == null && !textSaid.Contains(select.Choose) && select.CheckState(mw.Main))
+            //        {
+            //            textList.Add(select);
+            //            break;
+            //        }
+            //    }
+            //}
             RelsSelect();
         }
     }
