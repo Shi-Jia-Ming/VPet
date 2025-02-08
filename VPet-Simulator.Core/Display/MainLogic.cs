@@ -41,6 +41,13 @@ namespace VPet_Simulator.Core
         {
             Say(text, Core.Graph.FindName(GraphType.Say), force, desc);
         }
+
+        /// <summary>
+        /// 说话，使用随机表情，采用流式输出
+        /// </summary>
+        /// <param name="content">流式输出句柄</param>
+        /// <param name="force">是否强制</param>
+        /// <param name="desc">描述</param>
         public void SayRnd(IAsyncEnumerable<string> content, bool force = false, string desc = null)
         {
             Say(content, Core.Graph.FindName(GraphType.Say), force, desc);
@@ -85,31 +92,22 @@ namespace VPet_Simulator.Core
         {
             Task.Run(() =>
             {
-				OnSay?.Invoke("");
 				if (force || !string.IsNullOrWhiteSpace(graphname) && DisplayType.Type == GraphType.Default)//这里不使用idle是因为idle包括学习等
 					Display(graphname, AnimatType.A_Start, () =>
                 {
                     Dispatcher.Invoke(() =>
                     {
-                        //MsgBar.Show(Core.Save.Name, "");
-                        //await foreach (var text in content)
-                        //    MsgBar.ShowStream(Core.Save.Name, text, graphname, (string.IsNullOrWhiteSpace(desc) ? null :
-                        //    new TextBlock() { Text = desc, FontSize = 20, ToolTip = desc, HorizontalAlignment = HorizontalAlignment.Right }));
                         MsgBar.ShowStreamAsync(Core.Save.Name, content, graphname, (string.IsNullOrWhiteSpace(desc) ? null :
 							new TextBlock() { Text = desc, FontSize = 20, ToolTip = desc, HorizontalAlignment = HorizontalAlignment.Right }));
-
 					});
-                });
+					DisplayBLoopingForce(graphname);
+				});
 				else
 				{
                     Dispatcher.Invoke(() =>
                     {
-                        //MsgBar.Show(Core.Save.Name, "");
-                        //await foreach (var text in content)
-                        //	MsgBar.ShowStream(Core.Save.Name, text, graphname, msgcontent: (string.IsNullOrWhiteSpace(desc) ? null :
-                        //	new TextBlock() { Text = desc, FontSize = 20, ToolTip = desc, HorizontalAlignment = HorizontalAlignment.Right }));
                         MsgBar.ShowStreamAsync(Core.Save.Name, content, graphname, (string.IsNullOrWhiteSpace(desc) ? null :
-new TextBlock() { Text = desc, FontSize = 20, ToolTip = desc, HorizontalAlignment = HorizontalAlignment.Right }));
+                        new TextBlock() { Text = desc, FontSize = 20, ToolTip = desc, HorizontalAlignment = HorizontalAlignment.Right }));
                     });
 				}
 			});
