@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Controls;
+using static System.Net.Mime.MediaTypeNames;
 using static VPet_Simulator.Core.GraphHelper;
 using static VPet_Simulator.Core.GraphInfo;
 using static VPet_Simulator.Core.WorkTimer;
@@ -40,6 +41,17 @@ namespace VPet_Simulator.Core
         {
             Say(text, Core.Graph.FindName(GraphType.Say), force, desc);
         }
+
+        /// <summary>
+        /// 说话，使用随机表情，采用流式输出
+        /// </summary>
+        /// <param name="content">流式输出句柄</param>
+        /// <param name="force">是否强制</param>
+        /// <param name="desc">描述</param>
+        public void SayRnd(IAsyncEnumerable<string> content, bool force = false, string desc = null)
+        {
+            Say(content, Core.Graph.FindName(GraphType.Say), force, desc);
+        }
         /// <summary>
         /// 说话
         /// </summary>
@@ -72,6 +84,35 @@ namespace VPet_Simulator.Core
                 }
             });
         }
+
+        /// <summary>
+        /// 说话，接收流式数据
+        /// </summary>
+        public void Say(IAsyncEnumerable<string> content, string graphname = null, bool force = false, string desc = null)
+        {
+            Task.Run(() =>
+            {
+				if (force || !string.IsNullOrWhiteSpace(graphname) && DisplayType.Type == GraphType.Default)//这里不使用idle是因为idle包括学习等
+					Display(graphname, AnimatType.A_Start, () =>
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                        MsgBar.ShowStreamAsync(Core.Save.Name, content, graphname, (string.IsNullOrWhiteSpace(desc) ? null :
+							new TextBlock() { Text = desc, FontSize = 20, ToolTip = desc, HorizontalAlignment = HorizontalAlignment.Right }));
+					});
+					DisplayBLoopingForce(graphname);
+				});
+				else
+				{
+                    Dispatcher.Invoke(() =>
+                    {
+                        MsgBar.ShowStreamAsync(Core.Save.Name, content, graphname, (string.IsNullOrWhiteSpace(desc) ? null :
+                        new TextBlock() { Text = desc, FontSize = 20, ToolTip = desc, HorizontalAlignment = HorizontalAlignment.Right }));
+                    });
+				}
+			});
+        }
+
         /// <summary>
         /// 说话
         /// </summary>

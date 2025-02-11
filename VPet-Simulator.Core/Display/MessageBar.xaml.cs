@@ -22,9 +22,18 @@ namespace VPet_Simulator.Core
         /// <param name="msgcontent">消息框内容</param>
         void Show(string name, string text, string graphname = null, UIElement msgcontent = null);
         /// <summary>
-        /// 强制关闭
+        /// 显示流式消息
         /// </summary>
-        void ForceClose();
+        /// <param name="name"></param>
+        /// <param name="textStream"></param>
+        /// <param name="graphname"></param>
+        /// <param name="msgcontent"></param>
+        /// <returns></returns>
+        void ShowStreamAsync(string name, IAsyncEnumerable<string> textStream, string graphname = null, UIElement msgcontent = null);
+		/// <summary>
+		/// 强制关闭
+		/// </summary>
+		void ForceClose();
         /// <summary>
         /// 设置位置在桌宠内
         /// </summary>
@@ -80,10 +89,30 @@ namespace VPet_Simulator.Core
             }
         }
 
-        List<char> outputtext;
+
+		bool streamStart = false;
+		bool streamStop = false;
+		List<char> outputtext;
         private void ShowTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (outputtext.Count > 0)
+            if (streamStart && !streamStop)
+            {
+                // 如果 outputtext 中没有内容，则等待
+                if (outputtext == null || outputtext.Count == 0)
+                {
+					return;
+                }
+                var str = outputtext[0];
+                outputtext.RemoveAt(0);
+                Dispatcher.Invoke(() => { TText.Text += str; });
+                return;
+            }
+            else if (streamStart && !streamStop)
+            {
+				ShowTimer.Stop();
+				EndTimer.Start();
+			}
+			if (outputtext.Count > 0)
             {
                 var str = outputtext[0];
                 outputtext.RemoveAt(0);
@@ -163,6 +192,46 @@ namespace VPet_Simulator.Core
                 MessageBoxContent.Children.Add(msgcontent);
             }
         }
+
+		public void ShowStreamAsync(string name, IAsyncEnumerable<string> textStream, string graphname = null, UIElement msgcontent = null)
+		{
+			if (m.UIGrid.Children.IndexOf(this) != m.UIGrid.Children.Count - 1)
+			{
+				Panel.SetZIndex(this, m.UIGrid.Children.Count - 1);
+			}
+			MessageBoxContent.Children.Clear();
+			TText.Text = "";
+			timeleft = 3;
+			LName.Content = name;
+			
+			//ShowTimer.Start(); EndTimer.Stop(); CloseTimer.Stop();
+			this.Visibility = Visibility.Visible;
+			Opacity = .8;
+			graphName = graphname;
+
+            _ = Task.Run(async () =>
+			{
+                outputtext = new List<char>();
+				ShowTimer.Start(); EndTimer.Stop(); CloseTimer.Stop();
+
+				streamStart = true;
+				streamStop = false;
+				await foreach (var text in textStream)
+				{
+					outputtext.AddRange(text.ToList());
+					timeleft += text.Length;
+				}
+                streamStop = true;
+				streamStart = false;
+			});
+
+
+
+			if (msgcontent != null)
+			{
+				MessageBoxContent.Children.Add(msgcontent);
+			}
+		}
 
         public void Border_MouseEnter(object sender, MouseEventArgs e)
         {
