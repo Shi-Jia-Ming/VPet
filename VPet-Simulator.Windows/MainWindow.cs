@@ -1997,7 +1997,31 @@ namespace VPet_Simulator.Windows
                       Checked = Topmost
                   };
                   m_menu.Items.Add(topmost);
-                  m_menu.Items.Add(new MenuItem("操作教程".Translate(), null, (x, y) =>
+                  // 桌宠隐身
+                  var m_hide = new MenuItem("桌宠隐身".Translate(), null, (x, y) =>
+                  {
+                      if (Main.Visibility == Visibility.Visible)
+                      {
+                          Main.Hide();
+                          petHelper.Hide();
+						  notifyIcon.Text = "虚拟桌宠模拟器".Translate() + PrefixSave + " - 隐身";
+					  }
+					  else
+                      {
+                          Main.Show();
+                          petHelper.Show();
+						  notifyIcon.Text = "虚拟桌宠模拟器".Translate() + PrefixSave;
+                      }
+                  })
+                  {
+                      Name = "NotifyIcon_Hide",
+                      CheckOnClick = true,
+                      Checked = Main.Visibility == Visibility.Collapsed
+                  };
+
+				  m_menu.Items.Add(m_hide);
+
+				  m_menu.Items.Add(new MenuItem("操作教程".Translate(), null, (x, y) =>
                   {
                       if (LocalizeCore.CurrentCulture == "zh-Hans")
                           ExtensionFunction.StartURL(ExtensionValue.BaseDirectory + @"\Tutorial.html");
