@@ -586,7 +586,7 @@ namespace VPet_Simulator.Core
             if (this.Visibility == Visibility.Collapsed)
             {
                 this.Visibility = Visibility.Visible;
-                Display(GraphType.StartUP, AnimatType.Single, DisplayNomal);
+                Display(GraphType.StartUP, AnimatType.Single, DisplayToNomal);
             }
         }
     }
