@@ -566,5 +566,27 @@ namespace VPet_Simulator.Core
                     }
             }
         }
+
+        public void Hide()
+        {
+			if (this.Visibility == Visibility.Visible)
+			{
+                Display(GraphType.Shutdown, AnimatType.Single, () => {
+                    Dispatcher.Invoke(() =>
+                    {
+                        this.Visibility = Visibility.Collapsed;
+                    });
+				});
+			}
+		}
+
+        public void Show()
+        {
+            if (this.Visibility == Visibility.Collapsed)
+            {
+                this.Visibility = Visibility.Visible;
+                Display(GraphType.StartUP, AnimatType.Single, DisplayNomal);
+            }
+        }
     }
 }
