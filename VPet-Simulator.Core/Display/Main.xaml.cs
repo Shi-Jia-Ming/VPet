@@ -575,6 +575,7 @@ namespace VPet_Simulator.Core
                     Dispatcher.Invoke(() =>
                     {
                         this.Visibility = Visibility.Collapsed;
+                        
                     });
 				});
 			}

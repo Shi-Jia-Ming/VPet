@@ -2003,12 +2003,14 @@ namespace VPet_Simulator.Windows
                       if (Main.Visibility == Visibility.Visible)
                       {
                           Main.Hide();
+                          petHelper.Hide();
 						  notifyIcon.Text = "虚拟桌宠模拟器".Translate() + PrefixSave + " - 隐身";
 					  }
 					  else
                       {
                           Main.Show();
-                          notifyIcon.Text = "虚拟桌宠模拟器".Translate() + PrefixSave;
+                          petHelper.Show();
+						  notifyIcon.Text = "虚拟桌宠模拟器".Translate() + PrefixSave;
                       }
                   })
                   {
